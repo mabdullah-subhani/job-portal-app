@@ -1,0 +1,46 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: gateway-service
+  config:
+    import: optional:classpath:application-secrets.yml
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty.http.client: WARN
+  pattern:
+    correlation: "[%X{traceId:-},%X{spanId:-}]"
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        minimumNumberOfCalls: 5
+    instances:
+      authServiceCircuitBreaker:
+        baseConfig: default
+      employerServiceCircuitBreaker:
+        baseConfig: default
+      candidateServiceCircuitBreaker:
+        baseConfig: default
+      jobServiceCircuitBreaker:
+        baseConfig: default
+      applicationServiceCircuitBreaker:
+        baseConfig: default
+      fileServiceCircuitBreaker:
+        baseConfig: default
