@@ -4,10 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
-public class JobPostDTO {
-    private Long id;
+public class CreateJobPostRequest {
+    private UUID id;
 
     @NotBlank(message = "Job title is required")
     private String title;
@@ -24,6 +25,5 @@ public class JobPostDTO {
     @NotNull(message = "Salary is required")
     private Double salary;
 
-    private LocalDateTime createdAt;
-    private Long employerId;
+    private UUID employerId;
 }

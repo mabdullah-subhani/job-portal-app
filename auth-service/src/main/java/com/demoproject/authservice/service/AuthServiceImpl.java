@@ -1,6 +1,5 @@
 package com.demoproject.authservice.service;
 
-import com.demoproject.authservice.config.CandidateClient;
 import com.demoproject.authservice.config.JwtUtil;
 import com.demoproject.authservice.dto.LoginRequest;
 import com.demoproject.authservice.dto.LoginResponse;
@@ -11,7 +10,6 @@ import com.demoproject.authservice.entity.User;
 import com.demoproject.authservice.exception.DuplicateResourceException;
 import com.demoproject.authservice.exception.ResourceNotFoundException;
 import com.demoproject.authservice.repository.UserRepository;
-import com.demoproject.candidateservice.dto.CreateCandidateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CandidateClient candidateClient;
+
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
@@ -48,11 +46,11 @@ public class AuthServiceImpl implements AuthService {
             throw new DuplicateResourceException("Email is already registered");
         }
 
-        // Always assign default role USER
+        // Assign default role USER
         Set<Role> roles = new HashSet<>();
         roles.add(Role.ROLE_USER);
 
-
+        // Create user entity
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -61,21 +59,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(user);
-
         log.info("User {} registered successfully", user.getUsername());
-
-        // auto-create candidate profile
-        try {
-            candidateClient.createCandidate(
-                    CreateCandidateRequest.builder()
-                            .userId(user.getId())
-                            .username(user.getUsername())
-                            .email(user.getEmail())
-                            .build()
-            );
-        } catch (Exception e) {
-            log.error("Failed to create candidate profile for user {}", user.getUsername(), e);
-        }
 
         // Build proper response
         return RegisterResponse.builder()
@@ -88,11 +72,12 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+
     @Override
     public LoginResponse login(LoginRequest request) {
         log.info("Login attempt for user/email: {}", request.getLogin());
 
-        // Authenticate credentials (username or email)
+        // Authenticate credentials
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getLogin(),
@@ -110,7 +95,6 @@ public class AuthServiceImpl implements AuthService {
                     return new ResourceNotFoundException("User not found with username or email: " + request.getLogin());
                 });
 
-
         // Convert Role enums to String set
         Set<String> roleStrings = user.getRoles().stream()
                 .map(Enum::name)
@@ -120,6 +104,7 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), roleStrings);
         log.info("JWT token generated successfully for user/email: {}", request.getLogin());
 
+        // Build login response with candidate UUID
         return LoginResponse.builder()
                 .token(token)
                 .tokenType("Bearer")

@@ -1,80 +1,105 @@
 package com.demoproject.employerservice.controller;
 
-import com.demoproject.employerservice.dto.ApiResponse;
-import com.demoproject.employerservice.dto.EmployerDTO;
-import com.demoproject.employerservice.entity.Employer;
-import com.demoproject.employerservice.mapper.EmployerMapper;
+import com.demoproject.employerservice.payload.ApiResponse;
+import com.demoproject.employerservice.dto.CreateEmployerRequest;
+import com.demoproject.employerservice.dto.EmployerResponse;
+import com.demoproject.employerservice.dto.UpdateEmployerRequest;
 import com.demoproject.employerservice.service.EmployerService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/employers")
 @RequiredArgsConstructor
+@Tag(name = "Employer Management", description = "APIs to manage employer profiles and company data")
 public class EmployerController {
 
     private final EmployerService employerService;
-    private final EmployerMapper employerMapper;
-
 
     @PostMapping
-    @Operation(
-            summary = "Create a new employer profile",
-            description = "Registers a new employer by providing company name, description, and other related details."
-    )
-    public ResponseEntity<ApiResponse<EmployerDTO>> createEmployer(@Valid @RequestBody EmployerDTO dto) {
-        Employer employer = employerMapper.toEntity(dto);
-        Employer saved = employerService.createEmployer(employer);
-        EmployerDTO responseDTO = employerMapper.toDTO(saved);
-        return ResponseEntity.ok(ApiResponse.success("Employer created successfully", responseDTO));
+    @Operation(summary = "Create employer profile",
+            description = "Create a new employer profile for the logged-in user.")
+    public ResponseEntity<ApiResponse<EmployerResponse>> createEmployer(
+            @Valid @RequestBody CreateEmployerRequest request) {
+
+        EmployerResponse response = employerService.createEmployer(request);
+        return ResponseEntity.ok(ApiResponse.success("Employer created successfully", response));
     }
 
-    @PutMapping("/{id}")
-    @Operation(
-            summary = "Update an existing employer profile",
-            description = "Updates an employer’s information such as company name, email, address, industry, and description using the employer ID."
-    )
-    public ResponseEntity<ApiResponse<EmployerDTO>> updateEmployer(
-            @PathVariable Long id,
-            @Valid @RequestBody EmployerDTO dto) {
+    @PatchMapping("/{id}")
+    @Operation(summary = "Update employer profile",
+            description = "Partially update employer profile fields. Only non-null fields in request are applied.")
+    public ResponseEntity<ApiResponse<EmployerResponse>> updateEmployer(
+            @PathVariable("id") UUID id,
+            @RequestBody UpdateEmployerRequest request) {
 
-        Employer updatedEmployer = employerMapper.toEntity(dto);
-        Employer savedEmployer = employerService.updateEmployer(id, updatedEmployer);
-        EmployerDTO responseDTO = employerMapper.toDTO(savedEmployer);
-
-        return ResponseEntity.ok(ApiResponse.success("Employer updated successfully", responseDTO));
-    }
-
-    @GetMapping
-    @Operation(summary = "Get all employers", description = "Fetches a list of all registered employers on the Job Portal platform.")
-    public ResponseEntity<ApiResponse<List<EmployerDTO>>> getAllEmployers() {
-        List<Employer> employers = employerService.getAllEmployers();
-        List<EmployerDTO> response = employers.stream().map(employerMapper::toDTO).toList();
-        return ResponseEntity.ok(ApiResponse.success("Employers fetched successfully", response));
+        EmployerResponse response = employerService.updateEmployer(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Employer updated successfully", response));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get employer by ID", description = "Fetches detailed employer information using the employer ID.")
-    public ResponseEntity<ApiResponse<EmployerDTO>> getEmployerById(@PathVariable Long id) {
-        Employer employer = employerService.getEmployerById(id);
-        EmployerDTO dto = employerMapper.toDTO(employer);
-        return ResponseEntity.ok(ApiResponse.success("Employer fetched successfully", dto));
+    @Operation(summary = "Get employer by ID",
+            description = "Retrieve full employer profile using employer ID.")
+    public ResponseEntity<ApiResponse<EmployerResponse>> getEmployerById(@PathVariable("id") UUID id) {
+        EmployerResponse response = employerService.getEmployerById(id);
+        return ResponseEntity.ok(ApiResponse.success("Employer fetched successfully", response));
+    }
+
+    @GetMapping("/by-user/{userId}")
+    @Operation(summary = "Get employer by user ID",
+            description = "Fetch employer profile linked to a specific user account (owner).")
+    public ResponseEntity<ApiResponse<EmployerResponse>> getEmployerByUserId(@PathVariable("userId") Long userId) {
+        EmployerResponse response = employerService.getEmployerByUserId(userId);
+        return ResponseEntity.ok(ApiResponse.success("Employer fetched successfully", response));
+    }
+
+
+    @GetMapping
+    @Operation(summary = "List employers (paginated)",
+            description = "Retrieve paginated list of employers. Provide page and size as query params.")
+    public ResponseEntity<ApiResponse<List<EmployerResponse>>> listEmployers(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size) {
+
+        List<EmployerResponse> list = employerService.getAllEmployers(page, size);
+        return ResponseEntity.ok(ApiResponse.success("Employers retrieved successfully", list));
+    }
+
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete employer profile",
+            description = "Delete the employer profile owned by the logged-in user.")
+    public ResponseEntity<ApiResponse<Void>> deleteEmployer(@PathVariable("id") UUID id) {
+        employerService.deleteEmployer(id);
+        return ResponseEntity.ok(ApiResponse.success("Employer deleted successfully", null));
     }
 
     @GetMapping("/{id}/exists")
-    @Operation(
-            summary = "Check if employer exists",
-            description = "Verifies whether an employer with the given ID exists in the system. Used by other services like Job Service via Feign client."
-    )
-    public ResponseEntity<ApiResponse<Boolean>> checkEmployerExists(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Boolean>> checkEmployerExists(@PathVariable("id") UUID id) {
         boolean exists = employerService.checkEmployerExists(id);
-        String message = exists ? "Employer exists." : "Employer not found.";
-        return ResponseEntity.ok(ApiResponse.success(message, exists));
+        return ResponseEntity.ok(ApiResponse.success("Checked existence", exists));
+    }
+
+    @PostMapping("/{employerId}/job/{jobId}")
+    public ResponseEntity<ApiResponse<Void>> addJobIdToEmployer(
+            @PathVariable("employerId") UUID employerId,
+            @PathVariable("jobId") UUID jobId) {
+
+        employerService.addJobIdToEmployer(employerId, jobId);
+        return ResponseEntity.ok(ApiResponse.success("Job added to employer successfully", null));
+    }
+
+    @GetMapping("/user/{userId}/id")
+    public ResponseEntity<ApiResponse<UUID>> getEmployerId(@PathVariable("userId") Long userId) {
+        UUID employerId = employerService.getEmployerIdByUserIdOnly(userId);
+        return ResponseEntity.ok(ApiResponse.success("Employer ID fetched", employerId));
     }
 
 }

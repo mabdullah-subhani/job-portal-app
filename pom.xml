@@ -29,6 +29,7 @@
         <module>employer-service</module>
         <module>job-service</module>
         <module>file-service</module>
+        <module>application-service</module>
     </modules>
 
 
@@ -77,6 +78,12 @@
                 <version>${mapstruct.version}</version>
                 <scope>provided</scope>
             </dependency>
+
+            <!-- Liquibase -->
+            <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -90,6 +97,10 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
+                        <release>${java.version}</release>
+                        <compilerArgs>
+                            <arg>-parameters</arg>
+                        </compilerArgs>
                     </configuration>
                 </plugin>
 

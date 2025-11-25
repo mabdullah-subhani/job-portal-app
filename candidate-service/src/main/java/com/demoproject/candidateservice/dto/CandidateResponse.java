@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -11,14 +12,13 @@ import java.util.UUID;
 public class CandidateResponse {
     private UUID id;
     private Long userId;
-    private String username;
-    private String email;
+    private String fullName;
     private String phoneNumber;
+    private LocalDate dateOfBirth;
     private String location;
     private String education;
-    private String experience;
-    private String skills;
-    private String resumeUrl;
-    private LocalDate dateOfBirth;
+    private Integer experience;
+    private Set<String> skills;
+    private UUID resumeFileId;
+    private String resumeFileUrl;
 }
-

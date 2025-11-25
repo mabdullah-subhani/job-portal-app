@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -19,21 +21,22 @@ public class Candidate extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long userId;
-
-    @Column(nullable = false)
-    private String username;
-
-    @Column(nullable = false)
-    private String email;
-
+    private String fullName;
     private String phoneNumber;
-    private String resumeUrl;
+    private LocalDate dateOfBirth;
     private String location;
     private String education;
-    private String experience;
-    private String skills;
-    private LocalDate dateOfBirth;
-}
+    private Integer experience;
+    private UUID resumeFileId;
+    private String resumeFileUrl;
 
+
+    @ElementCollection
+    @CollectionTable(name = "candidate_skills", joinColumns = @JoinColumn(name = "candidate_id"))
+    @Column(name = "skill")
+    @Builder.Default
+    private Set<String> skills = new HashSet<>();
+
+}

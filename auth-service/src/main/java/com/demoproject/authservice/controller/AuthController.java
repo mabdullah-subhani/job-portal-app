@@ -20,37 +20,28 @@ public class AuthController {
     private final AuthService authService;
 
     @Operation(summary = "Register a new user")
-    @ApiResponses(value = {
+    @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User registered successfully"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Validation or duplicate error")
     })
     @PostMapping("/register")
-    public ResponseEntity<com.demoproject.authservice.payload.ApiResponse<RegisterResponse>> registerUser(
+    public ResponseEntity<ApiResponse<RegisterResponse>> registerUser(
             @Valid @RequestBody RegisterRequest request) {
-        RegisterResponse response = authService.register(request);
-        return ResponseEntity.ok(com.demoproject.authservice.payload.ApiResponse.<RegisterResponse>builder()
-                .success(true)
-                .message("User registered successfully")
-                .data(response)
-                .build());
+        var response = authService.register(request);
+        return ResponseEntity.ok(ApiResponse.success("User registered successfully", response));
     }
 
     @Operation(summary = "Login user and get JWT")
-    @ApiResponses(value = {
+    @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Login successful"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid credentials")
     })
     @PostMapping("/login")
-    public ResponseEntity<com.demoproject.authservice.payload.ApiResponse<LoginResponse>> loginUser(
+    public ResponseEntity<ApiResponse<LoginResponse>> loginUser(
             @Valid @RequestBody LoginRequest request) {
-        LoginResponse response = authService.login(request);
-        return ResponseEntity.ok(com.demoproject.authservice.payload.ApiResponse.<LoginResponse>builder()
-                .success(true)
-                .message("Login successful")
-                .data(response)
-                .build());
+        var response = authService.login(request);
+        return ResponseEntity.ok(ApiResponse.success("Login successful", response));
     }
-
 
     @PatchMapping("/update/email/{userId}")
     public ResponseEntity<ApiResponse<String>> updateEmail(
@@ -58,11 +49,7 @@ public class AuthController {
             @Valid @RequestBody UpdateEmailRequest request) {
 
         authService.updateEmail(userId, request.getEmail());
-        return ResponseEntity.ok(ApiResponse.<String>builder()
-                .success(true)
-                .message("Email updated successfully")
-                .data(request.getEmail())
-                .build());
+        return ResponseEntity.ok(ApiResponse.success("Email updated successfully", request.getEmail()));
     }
 
     @PatchMapping("/update/username/{userId}")
@@ -71,33 +58,21 @@ public class AuthController {
             @Valid @RequestBody UpdateUsernameRequest request) {
 
         authService.updateUsername(userId, request.getUsername());
-        return ResponseEntity.ok(ApiResponse.<String>builder()
-                .success(true)
-                .message("Username updated successfully")
-                .data(request.getUsername())
-                .build());
+        return ResponseEntity.ok(ApiResponse.success("Username updated successfully", request.getUsername()));
     }
 
     @PatchMapping("/update/password/{userId}")
-    public ResponseEntity<ApiResponse<String>> updatePassword(
+    public ResponseEntity<ApiResponse<Void>> updatePassword(
             @PathVariable Long userId,
             @Valid @RequestBody UpdatePasswordRequest request) {
 
         authService.updatePassword(userId, request.getPassword());
-        return ResponseEntity.ok(ApiResponse.<String>builder()
-                .success(true)
-                .message("Password updated successfully")
-                .build());
+        return ResponseEntity.ok(ApiResponse.success("Password updated successfully", null));
     }
 
     @PatchMapping("/upgrade-to-employer/{userId}")
-    public ResponseEntity<ApiResponse<String>> upgradeRole(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<Void>> upgradeRole(@PathVariable Long userId) {
         authService.upgradeToEmployer(userId);
-        return ResponseEntity.ok(ApiResponse.<String>builder()
-                .success(true)
-                .message("User role upgraded to EMPLOYER")
-                .build());
+        return ResponseEntity.ok(ApiResponse.success("User role upgraded to EMPLOYER", null));
     }
 }
-
-

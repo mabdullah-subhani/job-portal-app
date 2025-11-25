@@ -2,14 +2,16 @@ package com.demoproject.candidateservice.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.util.Set;
+
 @Data
 public class UpdateCandidateRequest {
-
+    private String fullName;
     private String phoneNumber;
+    private LocalDate dateOfBirth;
     private String location;
     private String education;
-    private String experience;
-    private String skills;
-    private String resumeUrl;
+    private Integer experience;
+    private Set<String> skills;
 }
-

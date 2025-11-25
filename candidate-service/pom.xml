@@ -11,7 +11,8 @@
     <artifactId>candidate-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Candidate Service</name>
-    <description>Handles candidate registration, profile management, and communication with other job portal services.</description>
+    <description>Handles candidate registration, profile management, and communication with other job portal services.
+    </description>
 
     <url/>
     <licenses>
@@ -34,6 +35,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
         <!-- Spring Data JPA + H2 -->
@@ -92,7 +99,6 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
-
         <!-- Optional: Resilience4j for Circuit Breaker (recommended for Feign) -->
         <dependency>
             <groupId>io.github.resilience4j</groupId>
@@ -105,6 +111,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.demoproject</groupId>
+            <artifactId>file-service</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -116,6 +128,7 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -143,6 +156,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>

@@ -4,7 +4,7 @@ spring:
   liquibase:
     change-log: classpath:db.changelog/db.changelog-master.yaml
   datasource:
-    url: jdbc:h2:file:./data/expense-service;DB_CLOSE_ON_EXIT=false
+    url: jdbc:h2:file:./data/candidate-service;DB_CLOSE_ON_EXIT=false
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -19,7 +19,7 @@ spring:
         jdbc.time_zone: UTC
   h2:
     console:
-      enabled: false
+      enabled: true
       path: /h2-console
 server:
   port: 8082

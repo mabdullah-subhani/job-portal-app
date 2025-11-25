@@ -1,4 +1,4 @@
-package com.demoproject.jobservice.dto;
+package com.demoproject.employerservice.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

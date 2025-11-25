@@ -1,0 +1,92 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: abdullah
+      changes:
+
+        # -------------------------
+        # JOB_POSTS TABLE
+        # -------------------------
+        - createTable:
+            tableName: job_posts
+            columns:
+
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: description
+                  type: VARCHAR(2000)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: location
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: employment_type
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: salary
+                  type: DOUBLE
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: employer_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              # Audit fields
+              - column:
+                  name: CREATED_AT
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: UPDATED_AT
+                  type: TIMESTAMP
+
+              - column:
+                  name: CREATED_BY
+                  type: VARCHAR(255)
+
+              - column:
+                  name: UPDATED_BY
+                  type: VARCHAR(255)
+
+        # -------------------------
+        # INDEXES
+        # -------------------------
+        - createIndex:
+            tableName: job_posts
+            indexName: idx_job_posts_employer
+            columns:
+              - column:
+                  name: employer_id
+
+        - createIndex:
+            tableName: job_posts
+            indexName: idx_job_posts_title
+            columns:
+              - column:
+                  name: title

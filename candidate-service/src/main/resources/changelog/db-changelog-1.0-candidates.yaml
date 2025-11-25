@@ -1,0 +1,85 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: abdullah
+      changes:
+        - createTable:
+            tableName: CANDIDATES
+            columns:
+              - column:
+                  name: ID
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: USER_ID
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+
+              - column:
+                  name: FULL_NAME
+                  type: VARCHAR(255)
+
+              - column:
+                  name: PHONE_NUMBER
+                  type: VARCHAR(50)
+
+              - column:
+                  name: DATE_OF_BIRTH
+                  type: DATE
+
+              - column:
+                  name: LOCATION
+                  type: VARCHAR(255)
+
+              - column:
+                  name: EDUCATION
+                  type: VARCHAR(255)
+
+              - column:
+                  name: EXPERIENCE
+                  type: INT
+
+              - column:
+                  name: CREATED_AT
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: UPDATED_AT
+                  type: TIMESTAMP
+
+              - column:
+                  name: CREATED_BY
+                  type: VARCHAR(255)
+
+              - column:
+                  name: UPDATED_BY
+                  type: VARCHAR(255)
+
+        - createTable:
+            tableName: candidate_skills
+            columns:
+              - column:
+                  name: candidate_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: skill
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: candidate_skills
+            baseColumnNames: candidate_id
+            referencedTableName: CANDIDATES
+            referencedColumnNames: ID
+            onDelete: CASCADE

@@ -1,7 +1,7 @@
 package com.demoproject.jobservice.exception;
 
 
-import com.demoproject.jobservice.dto.ApiResponse;
+import com.demoproject.jobservice.payload.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

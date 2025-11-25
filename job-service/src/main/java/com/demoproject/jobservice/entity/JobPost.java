@@ -2,27 +2,39 @@ package com.demoproject.jobservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class JobPost {
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "job_posts")
+public class JobPost extends BaseAuditEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
+    @Column(nullable = false)
     private String title;
-    private String description;
-    private String location;
-    private String employmentType; // Full-time, Part-time, Remote
-    private Double salary;
-    private LocalDateTime createdAt;
 
-    // ✅ Just store the employer ID instead of the whole Employer object
+    @Column(length = 2000, nullable = false)
+    private String description;
+
+    @Column(nullable = false)
+    private String location;
+
+    @Column(nullable = false)
+    private String employmentType; // Full-time, Part-time, Remote
+
+    @Column(nullable = false)
+    private Double salary;
+
     @Column(name = "employer_id", nullable = false)
-    private Long employerId;
+    private UUID employerId;
 }
